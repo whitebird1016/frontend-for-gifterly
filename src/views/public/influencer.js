@@ -24,6 +24,7 @@ import Button from "../../components/button";
 import { AuthContext } from "../../Context/AuthContext";
 import { toast } from "react-toastify";
 import LoadingPage from "../loading";
+
 function CampaignDetail() {
   const history = useHistory();
   const { user } = useContext(AuthContext);
@@ -34,6 +35,7 @@ function CampaignDetail() {
   const [selectgift, setGift] = useState([]);
   const [taskoflist, setTaskoflist] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [flag, setFlag] = useState(false);
   const [logo, setLogo] = useState("");
   const handleClick = async (item) => {
     setGift(item);
@@ -56,13 +58,11 @@ function CampaignDetail() {
       };
       if (selectgift.length !== 0) {
         await axios
-          .post("/api/incampaign/addincampaign", inCampaign)
+          .post(
+            process.env.REACT_APP_API + "/api/incampaign/addincampaign",
+            inCampaign
+          )
           .then((res) => {
-            setGift([]);
-            setGiftlist([]);
-            setName("");
-            setTaskoflist([]);
-            setCampaignid("");
             history.push(PUBLIC_INFLUENCER + PUBLIC_CAMPAIGN);
           });
       } else {
@@ -79,7 +79,10 @@ function CampaignDetail() {
         setIsLoading(true);
         const userid = { userid: user._id };
         await axios
-          .post("/api/incampaign/allincampaign", userid)
+          .post(
+            process.env.REACT_APP_API + "/api/incampaign/allincampaign",
+            userid
+          )
           .then((res) => {
             console.log(res);
             if (res.data.length === 0) {
@@ -104,7 +107,10 @@ function CampaignDetail() {
       try {
         const CampaignName = { name: campaignname };
         await axios
-          .post("/api/campaign/incampaign", CampaignName)
+          .post(
+            process.env.REACT_APP_API + "/api/campaign/incampaign",
+            CampaignName
+          )
           .then((res) => {
             const data = res.data;
             setGiftlist(data.gifts);
@@ -112,33 +118,67 @@ function CampaignDetail() {
             setTaskoflist(data.taskoflist);
             setCampaignid(data.userid);
             setLogo(data.logoimage);
+            data.country.map((item) => {
+              if (item.value === user.country) {
+                setFlag(true);
+              }
+            });
           });
       } catch (err) {
         console.log(err, "err");
       }
     };
     allincampaign();
+    const findUser = async () => {
+      try {
+        const options = {
+          params: { username: "maroon5" },
+          headers: {
+            "X-RapidAPI-Key":
+              "77dab6e8a2msh0e5c408e23de666p1e7961jsn7dba8eae82f8",
+            "X-RapidAPI-Host": "easy-instagram-service.p.rapidapi.com",
+          },
+        };
+
+        const result = await axios.get(
+          "https://easy-instagram-service.p.rapidapi.com/username-with-base64-image",
+          options
+        );
+        const response = await result.data;
+        console.log(response, "sdf");
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    findUser();
   }, []);
   return (
     <>
-      {isLoading ? (
-        <LoadingPage />
+      {!isLoading ? (
+        flag ? (
+          <Wrapper>
+            <Contenttext>{name}</Contenttext>
+            <GiftlistContent>
+              {giftlist.map((item, key) => (
+                <Giftlist key={key}>
+                  <img src={item.image} />
+                  <Contenttext2>SKU : {item.label}</Contenttext2>
+                  <>
+                    {item.name} && ${item.price}
+                  </>
+                  <Button text="select" onClick={() => handleClick(item)} />
+                </Giftlist>
+              ))}
+            </GiftlistContent>
+          </Wrapper>
+        ) : (
+          <>
+            Sorry, this campaign is not currently open to people in{" "}
+            {user.country}
+          </>
+        )
       ) : (
-        <Wrapper>
-          <Contenttext>{name}</Contenttext>
-          <GiftlistContent>
-            {giftlist.map((item, key) => (
-              <Giftlist key={key}>
-                <img src={item.image} />
-                <Contenttext2>SKU : {item.label}</Contenttext2>
-                <>
-                  {item.name} && ${item.price}
-                </>
-                <Button text="select" onClick={() => handleClick(item)} />
-              </Giftlist>
-            ))}
-          </GiftlistContent>
-        </Wrapper>
+        <LoadingPage />
       )}
     </>
   );

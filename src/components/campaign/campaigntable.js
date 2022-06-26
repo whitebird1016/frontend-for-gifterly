@@ -11,13 +11,12 @@ import TableRow from "@mui/material/TableRow";
 import axios from "axios";
 import ReactCountryFlag from "react-country-flag";
 import NoPage from "../../views/public/404page";
-import nodata from "../../assets/images/nodata.jpg";
+import nodata from "../../assets/images/nodata.png";
 import styled from "styled-components";
 import Button from "../button";
 import { toast } from "react-toastify";
 import { AuthContext } from "../../Context/AuthContext";
 import Inputtag from "../input";
-import ReactFlagsSelect from "react-flags-select";
 import { MultiSelect } from "react-multi-select-component";
 import ImgSize from "../imgsize";
 import { MdOutlineCampaign } from "react-icons/md";
@@ -47,6 +46,12 @@ const columns = [
     id: "url",
     label: "Option",
   },
+];
+
+const countrylist = [
+  { label: "United States", value: "US" },
+  { label: "United Kingdom", value: "GB" },
+  { label: "Italy", value: "IT" },
 ];
 
 const Wrapper = styled.div`
@@ -87,7 +92,7 @@ export default function CampaignTable() {
   const [campaignname, setCampaignname] = useState("");
   const [gift, setGift] = useState([]);
   const [taskoflist, setTaskoflist] = useState([]);
-  const [country, setCountry] = useState("");
+  const [country, setCountry] = useState([]);
   const { user } = useContext(AuthContext);
   const [productadd, setProductadd] = useState([]);
   const [giftlist, setGiftlist] = useState([]);
@@ -125,7 +130,10 @@ export default function CampaignTable() {
   const allproduct = async () => {
     try {
       const userid = { userid: user._id };
-      const res = await axios.post("/api/catalogue/allproduct", userid);
+      const res = await axios.post(
+        process.env.REACT_APP_API + "/api/catalogue/allproduct",
+        userid
+      );
       setProducts(res.data);
       const dropDownValue = res.data.map((response) => ({
         value: response.sku,
@@ -143,7 +151,10 @@ export default function CampaignTable() {
   const allcampaign = async () => {
     try {
       const userid = { userid: user._id };
-      const res = await axios.post("/api/campaign/allproduct", userid);
+      const res = await axios.post(
+        process.env.REACT_APP_API + "/api/campaign/allproduct",
+        userid
+      );
       setCampaign(res.data);
     } catch (err) {
       console.log(err);
@@ -155,7 +166,6 @@ export default function CampaignTable() {
       allproduct();
     }, 1000);
   }, [productadd]);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newCampaign = {
@@ -164,12 +174,15 @@ export default function CampaignTable() {
       taskoflist: taskoflist,
       country: country,
       userid: user._id,
-      url: "http://app.gifter.ly" + PUBLIC_CAMPAIGNS + "/" + campaignname,
+      url: "http://localhost:3000" + PUBLIC_CAMPAIGNS + "/" + campaignname,
       logoimage: user.logoimage,
     };
     try {
       await axios
-        .post("/api/campaign/addproduct", newCampaign)
+        .post(
+          process.env.REACT_APP_API + "/api/campaign/addproduct",
+          newCampaign
+        )
         .then((res) => setProductadd(res.data));
       toast("Campaign added");
       setIsOpen(false);
@@ -201,21 +214,12 @@ export default function CampaignTable() {
                   <MdOutlineCampaign />
                 </Inputtag>
               </InputContent>
-              <ReactFlagsSelect
-                className="reactflagsselect"
-                countries={["US", "GB", "FR", "DE", "IT"]}
-                customLabels={{
-                  US: "EN-US",
-                  GB: "EN-GB",
-                  FR: "FR",
-                  DE: "DE",
-                  IT: "IT",
-                }}
-                rfsKey="app-lang"
-                placeholder="Select Country"
-                searchPlaceholder="Search Countries"
-                selected={country}
-                onSelect={(code) => setCountry(code)}
+              <MultiSelect
+                options={countrylist}
+                value={country}
+                onChange={setCountry}
+                labelledBy="Select"
+                className="multiselect"
               />
               <MultiSelect
                 options={giftlist}
@@ -291,15 +295,19 @@ export default function CampaignTable() {
                             ))}
                           </TableCell>
                           <TableCell>
-                            <ReactCountryFlag
-                              countryCode={row.country}
-                              svg
-                              style={{
-                                width: "3em",
-                                height: "3em",
-                              }}
-                              title={row.country}
-                            />
+                            {row.country.map((item, key) => (
+                              <ReactCountryFlag
+                                countryCode={item.value}
+                                svg
+                                style={{
+                                  width: "3em",
+                                  height: "3em",
+                                  padding: "5px",
+                                }}
+                                title={item.value}
+                                key={key}
+                              />
+                            ))}
                           </TableCell>
                           <TableCell
                             sx={{ maxWidth: "50px", wordWrap: "break-word" }}

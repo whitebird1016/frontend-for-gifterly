@@ -27,7 +27,6 @@ const WrapperMidContent = styled.div`
 `;
 export default function Publiclayout() {
   const { user } = useContext(AuthContext);
-
   return (
     <Wrapper>
       <Header />
@@ -46,7 +45,6 @@ export default function Publiclayout() {
           </WrapperMidContent>
         </WrapperContent>
       )}
-
       <Footer />
     </Wrapper>
   );

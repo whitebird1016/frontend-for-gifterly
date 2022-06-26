@@ -37,7 +37,7 @@ const Header = () => {
         >
           <img
             className="user-profile-image"
-            src={user?.photo ? "/photo/" + user?.photo : Avatar}
+            src={user?.photo ? user?.photo : Avatar}
             alt=""
           />
         </IconButton>

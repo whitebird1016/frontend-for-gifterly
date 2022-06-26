@@ -10,7 +10,7 @@ function SidebarChat({ chatroomtile, currentUser }) {
   const socket = useRef();
 
   useEffect(() => {
-    socket.current = io("/");
+    socket.current = io(process.env.REACT_APP_API);
   }, []);
 
   useEffect(() => {
@@ -20,7 +20,9 @@ function SidebarChat({ chatroomtile, currentUser }) {
     });
     const getAmigodetails = async () => {
       try {
-        const response = await axios.get("/api/users/" + amigoId);
+        const response = await axios.get(
+          process.env.REACT_APP_API + "/api/users/" + amigoId
+        );
         setUser(response.data);
       } catch (err) {
         console.log(err);
@@ -33,7 +35,7 @@ function SidebarChat({ chatroomtile, currentUser }) {
     <div className="sidebarchat">
       <img
         className="amigo-profilepic"
-        src={user?.photo ? "/photo/" + user?.photo : noavatar}
+        src={user?.photo ? user?.photo : noavatar}
         alt=""
       />
       <div className={online ? "online" : "offile"}></div>

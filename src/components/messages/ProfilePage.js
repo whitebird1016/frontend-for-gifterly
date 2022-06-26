@@ -23,8 +23,14 @@ const ProfilePage = ({ toggler, togglestate }) => {
       updated_data.append("photo", photo);
     }
     try {
-      await axios.put("/api/users/" + user?._id, updated_data, config);
-      const result = await axios.get("/api/users/" + user?._id);
+      await axios.put(
+        process.env.REACT_APP_API + "/api/users/" + user?._id,
+        updated_data,
+        config
+      );
+      const result = await axios.get(
+        process.env.REACT_APP_API + "/api/users/" + user?._id
+      );
       const data = JSON.stringify(result.data);
       localStorage.setItem("user", data);
     } catch (err) {
@@ -42,7 +48,7 @@ const ProfilePage = ({ toggler, togglestate }) => {
         </div>
         <img
           className="profile-image"
-          src={user?.photo ? "/photo/" + user?.photo : avatar}
+          src={user?.photo ? user?.photo : avatar}
           alt=""
         ></img>
         <form>

@@ -4,7 +4,6 @@ import { PUBLIC_SIGNIN, PUBLIC_SIGNUP } from "../configs/router-config";
 import { ToastContainer } from "react-toastify";
 import { AuthContext } from "../Context/AuthContext";
 import { Offline, Online } from "react-detect-offline";
-
 import LoadingPage from "./loading";
 const Signin = React.lazy(() => {
   return new Promise((resolve) => {

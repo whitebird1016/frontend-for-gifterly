@@ -79,7 +79,10 @@ const InfluencerTable = () => {
         shopifyproduct: shopifyproducts,
       };
       await axios
-        .post("/api/incampaign/shopifyorder", shopifyproduct)
+        .post(
+          process.env.REACT_APP_API + "/api/incampaign/shopifyorder",
+          shopifyproduct
+        )
         .then((res) => console.log(res));
     } catch (err) {
       console.log(err);
@@ -88,7 +91,10 @@ const InfluencerTable = () => {
   const allproduct = async () => {
     try {
       const userid = { campaignid: user._id };
-      const res = await axios.post("/api/incampaign/allincampaign", userid);
+      const res = await axios.post(
+        process.env.REACT_APP_API + "/api/incampaign/allincampaign",
+        userid
+      );
       setProducts(res.data);
     } catch (err) {
       console.log(err);

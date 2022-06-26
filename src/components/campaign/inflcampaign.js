@@ -14,6 +14,8 @@ import { AuthContext } from "../../Context/AuthContext";
 import ImgSize from "../imgsize";
 import "../../assets/css/campaign.css";
 import loading from "../../assets/images/loading1.gif";
+import avatar from "../../assets/images/Logo.jpg";
+
 import { CheckboxGroup, Checkbox } from "@createnl/grouped-checkboxes";
 
 const columns = [
@@ -74,7 +76,7 @@ export default function CampaignTable() {
     try {
       const users = { _id: iduser, taskoflist: onChange };
       await axios
-        .post("/api/incampaign/updatelist", users)
+        .post(process.env.REACT_APP_API + "/api/incampaign/updatelist", users)
         .then((res) => setCampaign(res.data));
     } catch (err) {
       console.log(err);
@@ -84,10 +86,15 @@ export default function CampaignTable() {
   const allcampaign = async () => {
     try {
       const userid = { userid: user._id };
-      await axios.post("/api/incampaign/allincampaign", userid).then((res) => {
-        setCampaign(res.data);
-        Checktrack(res.data);
-      });
+      await axios
+        .post(
+          process.env.REACT_APP_API + "/api/incampaign/allincampaign",
+          userid
+        )
+        .then((res) => {
+          setCampaign(res.data);
+          Checktrack(res.data);
+        });
     } catch (err) {
       console.log(err, "err");
     }
@@ -99,7 +106,10 @@ export default function CampaignTable() {
       productss.map(async (item) => {
         if (item.orderid !== "") {
           const orderid = { orderid: item.orderid, _id: item._id };
-          await axios.post("/api/incampaign/tracking", orderid);
+          await axios.post(
+            process.env.REACT_APP_API + "/api/incampaign/tracking",
+            orderid
+          );
         } else {
           console.log("false");
         }
@@ -152,7 +162,10 @@ export default function CampaignTable() {
                       <TableRow hover role="checkbox" tabIndex={-1} key={i}>
                         <TableCell>{row.name}</TableCell>
                         <TableCell>
-                          <ImgSize url={"/photo/" + row.logoimage} key={i} />
+                          <ImgSize
+                            url={row.logoimage ? row.logoimage : avatar}
+                            key={i}
+                          />
                         </TableCell>
                         <TableCell>
                           <ImgSize url={row.gift[0].image} key={i} />

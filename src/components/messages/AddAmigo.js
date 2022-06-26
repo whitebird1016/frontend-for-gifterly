@@ -4,22 +4,44 @@ import { AuthContext } from "../../Context/AuthContext";
 import avatar from "../../assets/images/addamigo.png";
 import "../../assets/css/AddAmigo.css";
 
-function AddAmigo({ addchattoggler, addchattoggle }) {
-  const [amigousername, setAmigoUsername] = useState();
+const AddAmigo = ({ addchattoggler, addchattoggle }) => {
+  const [amigousername, setAmigoUsername] = useState("");
   const { user } = useContext(AuthContext);
-
+  const flag = true;
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.get(`/api/users/?username=${amigousername}`);
+      const response = await axios.get(
+        `${process.env.REACT_APP_API}/api/users/?username=${amigousername}`
+      );
       setAmigoUsername("");
+
+      const rooms = await axios.get(
+        process.env.REACT_APP_API + "/api/chatrooms/allrooms"
+      );
+      rooms.data.map((item) => {
+        if (
+          item.members[0] === user._id ||
+          item.members[0] === response.data._id
+        ) {
+          if (
+            item.members[1] === user._id ||
+            item.members[1] === response.data._id
+          ) {
+            flag = false;
+          }
+        }
+      });
       const data = {
         senderId: user._id,
         receiverId: response.data._id,
       };
-      await axios.post("/api/chatrooms", data);
+      if (flag === true) {
+        console.log("res");
+        await axios.post(process.env.REACT_APP_API + "/api/chatrooms", data);
+      }
     } catch (err) {}
-    window.location.reload();
+    // window.location.reload();
   };
 
   return (
@@ -46,6 +68,6 @@ function AddAmigo({ addchattoggler, addchattoggle }) {
       </div>
     </div>
   );
-}
+};
 
 export default AddAmigo;

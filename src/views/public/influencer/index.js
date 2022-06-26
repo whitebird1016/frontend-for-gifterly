@@ -53,7 +53,7 @@ const Inflencers = () => {
         followurl: followurl,
       };
       await axios
-        .post("/api/influencer/send", influencer)
+        .post(process.env.REACT_APP_API + "/api/influencer/send", influencer)
         .then((res) => toast(res.data));
       setIsOpen(false);
     } catch (err) {

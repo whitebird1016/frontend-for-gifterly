@@ -4,8 +4,7 @@ import { format } from "timeago.js";
 
 function Message({ message, own }) {
   return (
-    <div>
-      {console.log("message", message, "own", own)}
+    <div style={{ wordWrap: "break-word" }}>
       <p className={own ? "message-sent" : "message-received"}>
         <span>{message.text}</span>
         <span className="message-time">{format(message.createdAt)}</span>

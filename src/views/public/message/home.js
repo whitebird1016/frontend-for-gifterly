@@ -8,11 +8,9 @@ import ProfilePage from "../../../components/messages/ProfilePage";
 import SidebarChat from "../../../components/messages/SidebarChat.js";
 import EmptyChatRoom from "../../../components/messages/EmptyChatRoom";
 import { AuthContext } from "../../../Context/AuthContext";
-
 import axios from "axios";
 import { io } from "socket.io-client";
 import { Picker } from "emoji-mart";
-
 import SendIcon from "@material-ui/icons/Send";
 import MenuIcon from "@material-ui/icons/Menu";
 import SearchIcon from "@material-ui/icons/Search";
@@ -22,15 +20,13 @@ import AttachFileIcon from "@material-ui/icons/AttachFile";
 import InsertEmoticonIcon from "@material-ui/icons/InsertEmoticon";
 import "emoji-mart/css/emoji-mart.css";
 import noavatar from "../../../assets/images/noavatar.jpg";
-import ExitToAppIcon from "@material-ui/icons/ExitToApp";
-import CloseIcon from "@material-ui/icons/Close";
 
 function Home() {
   const [chatroomtiles, setChatroomtiles] = useState([]);
   const [currentchat, setCurrentchat] = useState(null);
   const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState("");
   const [arrivalMessage, setArrivalMessage] = useState(null);
+  const [newMessage, setNewMessage] = useState("");
   const [amigo, setAmigo] = useState();
   const [open, setOpen] = useState(false);
   const { user } = useContext(AuthContext);
@@ -40,7 +36,7 @@ function Home() {
   /* Making Messages Realtime */
 
   useEffect(() => {
-    socket.current = io("/");
+    socket.current = io(process.env.REACT_APP_API);
     socket.current.on("getMessage", (data) => {
       setArrivalMessage({
         sender: data.senderId,
@@ -65,7 +61,9 @@ function Home() {
   useEffect(() => {
     const getChatroomtiles = async () => {
       try {
-        const res = await axios.get("/api/chatrooms/" + user._id);
+        const res = await axios.get(
+          process.env.REACT_APP_API + "/api/chatrooms/" + user._id
+        );
         setChatroomtiles(res.data);
       } catch (err) {
         console.log(err);
@@ -80,7 +78,9 @@ function Home() {
     const amigoId = currentchat?.members.find((m) => m !== user._id);
     const getAmigodetails = async () => {
       try {
-        const response = await axios.get("/api/users/" + amigoId);
+        const response = await axios.get(
+          process.env.REACT_APP_API + "/api/users/" + amigoId
+        );
         setAmigo(response.data);
       } catch (err) {}
     };
@@ -92,17 +92,18 @@ function Home() {
   useEffect(() => {
     const getMessages = async () => {
       try {
-        const response = await axios.get("/api/messages/" + currentchat?._id);
+        const response = await axios.get(
+          process.env.REACT_APP_API + "/api/messages/" + currentchat?._id
+        );
         setMessages(response.data);
       } catch (err) {
         console.log(err);
       }
     };
+    console.log("sds");
     getMessages();
   }, [currentchat]);
-
   /* Scroll to the recent message */
-
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -139,7 +140,10 @@ function Home() {
     });
 
     try {
-      const response = await axios.post("/api/messages/", sendingMessage);
+      const response = await axios.post(
+        process.env.REACT_APP_API + "/api/messages/",
+        sendingMessage
+      );
       setMessages([...messages, response.data]);
       setNewMessage("");
     } catch (err) {
@@ -148,19 +152,11 @@ function Home() {
     setPick(false);
   };
 
-  /* Logout */
-
-  const logout = () => {
-    localStorage.removeItem("user");
-    window.location.reload();
-  };
-
   /* AddChat Toggle Setup */
 
   const [addtoggle, setAddtoggle] = useState(false);
   const addchatToggler = () => {
     addtoggle === false ? setAddtoggle(true) : setAddtoggle(false);
-    console.log(addtoggle);
   };
 
   /* Profile Page Toggle Setup */
@@ -250,7 +246,7 @@ function Home() {
                 <div className="chatroom-chatinfo">
                   <img
                     className="amigo-profilepic"
-                    src={amigo?.photo ? "/photo/" + amigo?.photo : noavatar}
+                    src={amigo?.photo ? amigo?.photo : noavatar}
                     alt=""
                   />
 
@@ -267,11 +263,12 @@ function Home() {
                   setPick(false);
                 }}
               >
-                {messages.map((message) => (
-                  <div key={message?._id} ref={scrollRef}>
+                {messages.map((message, key) => (
+                  <div key={key} ref={scrollRef}>
                     <Message
                       message={message}
                       own={message?.senderId === user._id}
+                      key={key}
                     />
                   </div>
                 ))}

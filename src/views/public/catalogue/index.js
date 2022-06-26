@@ -21,9 +21,12 @@ const Catalogue = () => {
   const [quantity, setQuantity] = useState([]);
   const { user } = useContext(AuthContext);
   const [modalIsOpen, setIsOpen] = useState(false);
+  const [clickshopify, setClickshopify] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const getTransactionData = async () => {
     await axios
-      .post("/api/catalogue/allproduct")
+      .post(process.env.REACT_APP_API + "/api/catalogue/allproduct")
       .then((res) => {
         setTransactionData(res.data);
       })
@@ -49,7 +52,11 @@ const Catalogue = () => {
     }
     try {
       await axios
-        .post("/api/catalogue/addproduct", newproduct, config)
+        .post(
+          process.env.REACT_APP_API + "/api/catalogue/addproduct",
+          newproduct,
+          config
+        )
         .then((res) => console(res.data));
       toast("product added");
       setIsOpen(false);
@@ -59,17 +66,21 @@ const Catalogue = () => {
   };
 
   const getShopifyData = async () => {
+    setLoading(true);
     try {
       const userid = user._id;
       await axios
-        .post("/api/catalogue/addshopify", {
+        .post(process.env.REACT_APP_API + "/api/catalogue/addshopify", {
           userid: userid,
         })
         .then((res) => console.log(res));
+      setClickshopify(!clickshopify);
     } catch (err) {
       toast(err.response.data);
     }
+    setLoading(false);
   };
+
   return (
     <Wrapper>
       <WrapperButton>
@@ -81,7 +92,7 @@ const Catalogue = () => {
           onClick={() => setIsOpen(true)}
         />
       </WrapperButton>
-      <CatalogueTable />
+      {!loading && <CatalogueTable clickshopify={clickshopify} />}
       <WrapperButton>
         <CSVLink
           data={transactionData}

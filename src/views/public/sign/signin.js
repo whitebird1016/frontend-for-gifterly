@@ -2,25 +2,29 @@ import React, { useState, useContext } from "react";
 import { useHistory, Link } from "react-router-dom";
 import styled from "styled-components";
 import background from "../../../assets/images/2.png";
-import Logo from "../../../assets/images/Logo.png";
+import Logo from "../../../assets/images/Logo.jpg";
 import { FiMail, FiEyeOff, FiEye } from "react-icons/fi";
 import { PUBLIC_SIGNUP } from "../../../configs/router-config";
 import { toast } from "react-toastify";
 import { AuthContext } from "../../../Context/AuthContext";
 import axios from "axios";
-
 import Sociallogin from "./sociallogin";
+import ImgSize from "../../../components/imgsize";
+
 const Signin = () => {
   const history = useHistory();
   const [show, setShow] = useState(false);
-  const [email, setEmail] = useState("");
+  const [emails, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { isFetching, dispatch } = useContext(AuthContext);
 
   const loginCall = async (userCredential, dispatch) => {
     dispatch({ type: "LOGIN_START" });
     try {
-      const res = await axios.post("/api/auth/signin", userCredential);
+      const res = await axios.post(
+        process.env.REACT_APP_API + "/api/auth/signin",
+        userCredential
+      );
       dispatch({ type: "LOGIN_SUCCESS", payload: res.data });
       toast("Login Success");
       history.push("/");
@@ -32,7 +36,7 @@ const Signin = () => {
 
   const handleForm = (e) => {
     e.preventDefault();
-    loginCall({ email, password }, dispatch);
+    loginCall({ emails, password }, dispatch);
   };
   const handleClick = (e) => {
     setShow(!show);
@@ -48,7 +52,7 @@ const Signin = () => {
       <SigninWrapper>
         <SigninWrapperContent>
           <Signinlogo>
-            <img src={Logo} alt="logo" />
+            <ImgSize url={Logo} alt="logo" width="100" height="100" />
           </Signinlogo>
           <Signintext1>Sign in</Signintext1>
           <Signintext2>

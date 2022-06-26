@@ -35,9 +35,10 @@ const columns = [
     label: "Option",
   },
 ];
-const CatalogueTable = () => {
+
+const CatalogueTable = (clickshopify) => {
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [delected, setDelected] = useState(false);
   const { user } = useContext(AuthContext);
   const [products, setProducts] = useState([]);
@@ -50,7 +51,10 @@ const CatalogueTable = () => {
     const productid = { _id: product_id };
     try {
       await axios
-        .post("/api/catalogue/deleteproduct", productid)
+        .post(
+          process.env.REACT_APP_API + "/api/catalogue/deleteproduct",
+          productid
+        )
         .then((res) => {
           setDelected(!delected);
           toast(res);
@@ -69,9 +73,11 @@ const CatalogueTable = () => {
   const allproduct = async () => {
     try {
       const userid = { userid: user._id };
-      await axios.post("/api/catalogue/allproduct", userid).then((res) => {
-        setProducts(res.data);
-      });
+      await axios
+        .post(process.env.REACT_APP_API + "/api/catalogue/allproduct", userid)
+        .then((res) => {
+          setProducts(res.data);
+        });
     } catch (err) {
       console.log(err);
     }
@@ -81,7 +87,7 @@ const CatalogueTable = () => {
       setIsLoaded(true);
       allproduct();
     }, 2000);
-  }, []);
+  }, [clickshopify]);
   return (
     <>
       {isLoaded && (
@@ -145,7 +151,7 @@ const CatalogueTable = () => {
             </Table>
           </TableContainer>
           <TablePagination
-            rowsPerPageOptions={[10, 20, 100]}
+            rowsPerPageOptions={[5, 10, 20]}
             component="div"
             count={products.length}
             rowsPerPage={rowsPerPage}

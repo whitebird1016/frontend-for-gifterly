@@ -1,16 +1,23 @@
 import React, { useState } from "react";
 import { useHistory, Link } from "react-router-dom";
 import background from "../../../assets/images/2.png";
-import Logo from "../../../assets/images/Logo.png";
+import Logo from "../../../assets/images/Logo.jpg";
 import { FiUsers, FiEyeOff, FiEye, FiMail } from "react-icons/fi";
 import { PUBLIC_SIGNIN } from "../../../configs/router-config";
 import { toast } from "react-toastify";
 import axios from "axios";
 import styled from "styled-components";
 import Sociallogin from "./sociallogin";
+import ButtonGroup from "../../../components/radiogroup";
+import ImgSize from "../../../components/imgsize";
+
+const RadioOptions = [
+  { name: "I am a Brand", value: "brand", default: true },
+  { name: "I am an Influencer", value: "influencer" },
+];
+
 const Signup = () => {
   const [show, setShow] = useState(false);
-
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
   const [username, setUsername] = useState();
@@ -23,19 +30,14 @@ const Signup = () => {
   const handleForm = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const config = {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
+    const data = {
+      username: username,
+      email: email,
+      password: password,
+      isBrand: isbrand,
     };
-    const data = new FormData();
-    data.append("username", username);
-    data.append("email", email);
-    data.append("password", password);
-    data.append("isBrand", isbrand);
-
     try {
-      await axios.post("/api/auth/signup", data, config);
+      await axios.post(process.env.REACT_APP_API + "/api/auth/signup", data);
       toast("Please Sign In");
       history.push("/signin");
     } catch (err) {
@@ -57,7 +59,7 @@ const Signup = () => {
       <SignupWrapper>
         <SignupWrapperContent>
           <Signuplogo>
-            <img src={Logo} alt="logo" />
+            <ImgSize url={Logo} alt="logo" width="100" height="100" />
           </Signuplogo>
           <Signuptext1>Sign up</Signuptext1>
           <Signuptext2>
@@ -106,21 +108,20 @@ const Signup = () => {
               <div onClick={handleClick}>{show ? <FiEyeOff /> : <FiEye />}</div>
             </Signupputdiv>
           </Signupput>
-
+          <Signupput>
+            <ButtonGroup
+              onChange={handlechange}
+              options={RadioOptions}
+              name="brand"
+            />
+          </Signupput>
           <Signupremem>
             <Signupremember>
               <Signuprememberinput type="checkbox" />
               Remember me
             </Signupremember>
-            <Signupremember>
-              <Signuprememberinput
-                type="checkbox"
-                onChange={handlechange}
-                checked={isbrand}
-              />
-              With Brand
-            </Signupremember>
-            <Signuprecover>fogot password </Signuprecover>
+
+            <Signuprecover>forgot password </Signuprecover>
           </Signupremem>
           <Signupbutton onClick={handleForm} isLoading={loading}>
             Sign Up

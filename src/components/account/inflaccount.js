@@ -43,8 +43,14 @@ const Brandaccount = () => {
     }
 
     try {
-      await axios.put("/api/users/" + user?._id, updated_data, config);
-      const result = await axios.get("/api/users/" + user?._id);
+      await axios.put(
+        process.env.REACT_APP_API + "/api/users/" + user?._id,
+        updated_data,
+        config
+      );
+      const result = await axios.get(
+        process.env.REACT_APP_API + "/api/users/" + user?._id
+      );
       const data = JSON.stringify(result.data);
       localStorage.setItem("user", data);
       toast("success");
@@ -55,7 +61,7 @@ const Brandaccount = () => {
   return (
     <Wrapper>
       <Wrapperimage />
-      <img src={user?.photo ? "/photo/" + user?.photo : Avatar} alt="Avatar" />
+      <img src={user?.photo ? user?.photo : Avatar} alt="Avatar" />
       <Wrappercontent>
         <Wrappercontentinput>
           <Inputwrapper1>
